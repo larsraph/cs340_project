@@ -270,13 +270,18 @@ INSERT INTO Addresses (address_id, country_code, zip_code, address_ln1, address_
   (1, 'USA', '12345', '200 Abc Pl',            NULL, NULL,         NULL),
   (2, 'USA', '56789', '666 Devil Street',      NULL, NULL,         NULL);
 
-/*People*/
+/* people*/
 INSERT INTO People (person_id, address_id, email, onid, phone_number, date_of_birth, gender_identity) VALUES
   (0, 0, 'joebiden@ab.c',   'bijo@osu.edu', '1231231234', '1999-03-21', 'Male'),
   (1, 0, 'obama@ab.c',      'obba@osu.edu', '2342342345', '2001-04-12', 'Male'),
   (2, 1, 'president@ab.c',  'prez@osu.edu', '3453453456', '2000-09-24', 'Yo Mama'),
   (3, 2, 'sweetfruit@ab.c', 'frsw@osu.edu', '4564564567', '1989-11-23', 'Female');
 
+/* roles*/
+INSERT INTO Roles (role_id, name) VALUES
+  (0, 'Vainglorious Leader'),
+  (1, 'Grunt'),
+  (2, 'Infiltrator');
 -- MEMBERSHIP --
 INSERT INTO `membership`
 (`club_id`, `person_id`, `role_id`) VALUES
