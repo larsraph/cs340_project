@@ -1,4 +1,7 @@
---testing--
+/*   Beaver Club (CS340) - Team 61
+   Raphael Larsen and America Pacheco*/
+
+
 
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19  Distrib 10.5.29-MariaDB, for Linux (x86_64)
