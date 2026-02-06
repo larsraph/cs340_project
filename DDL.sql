@@ -257,22 +257,23 @@ UNLOCK TABLES;
 -- Dump completed on 2026-02-05 15:14:36
 
 -- ALL THE EVENTS STUFF --
-INSERT INTO `Events` (`event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`) VALUES
-(0, 1, 1, “Valorant”, “Too lazy”, 2026-02-05 08:00:00, 2026-02-05 12:00:00),
-(1, 2, 1, “CSGO LAN”, “Also lazy”, 2026-02-05 13:30:00, 2026-02-05 17:45:00),
-(2, 0, 1, “Rivals”, “Weeeee”, 2026-02-06 09:15:00, 2026-02-06 11:30:00),
-(3, 1, 0, “Book club”, “Reading Red Rising”, 2026-02-06 14:00:00, 2026-02-06 18:30:00),
-(4, 2, 0, “Factorio”, “*Cracktorio”, 2026-02-07 07:45:00, 2026-02-07 11:15:00),
-(5, 0, 0, “Running club”, “Nyuuuuuu”, 2026-02-07 12:00:00, 2026-02-07 16:00:00);
+INSERT INTO `Events`
+(`event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`) VALUES
+(0, 1, 1, 'Valorant', 'Too lazy', '2026-02-05 08:00:00', '2026-02-05 12:00:00'),
+(1, 2, 1, 'CSGO LAN', 'Also lazy', '2026-02-05 13:30:00', '2026-02-05 17:45:00'),
+(2, 0, 1, 'Rivals', 'Weeeee', '2026-02-06 09:15:00', '2026-02-06 11:30:00'),
+(3, 1, 0, 'Book club', 'Reading Red Rising', '2026-02-06 14:00:00', '2026-02-06 18:30:00'),
+(4, 2, 0, 'Factorio', '*Cracktorio', '2026-02-07 07:45:00', '2026-02-07 11:15:00'),
+(5, 0, 0, 'Running club', 'Nyuuuuuu', '2026-02-07 12:00:00', '2026-02-07 16:00:00');
 
-INSERT INTO VirtualEvents
+INSERT INTO `VirtualEvents`
 (`event_id`, `url`) VALUES
-(0, “discord.gg/valorantppl”),
-(2, “discord.gg/rivalsppl”),
-(4, “zoom.com/pretend-this-is-uuid”);;
+(0, 'discord.gg/valorantppl'),
+(2, 'discord.gg/rivalsppl'),
+(4, 'zoom.com/pretend-this-is-uuid');
 
-INSERT INTO PhysicalEvents
+INSERT INTO `PhysicalEvents`
 (`event_id`, `address_id`) VALUES
 (5, 1),
 (1, 2),
-(3, 2)
+(3, 2);
