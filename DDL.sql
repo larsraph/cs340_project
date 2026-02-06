@@ -268,30 +268,15 @@ INSERT INTO Addresses (address_id, country_code, zip_code, address_ln1, address_
   (1, 'USA', '12345', '200 Abc Pl',            NULL, NULL,         NULL),
   (2, 'USA', '56789', '666 Devil Street',      NULL, NULL,         NULL);
 
-/*People*/
+/* people*/
 INSERT INTO People (person_id, address_id, email, onid, phone_number, date_of_birth, gender_identity) VALUES
   (0, 0, 'joebiden@ab.c',   'bijo@osu.edu', '1231231234', '1999-03-21', 'Male'),
   (1, 0, 'obama@ab.c',      'obba@osu.edu', '2342342345', '2001-04-12', 'Male'),
   (2, 1, 'president@ab.c',  'prez@osu.edu', '3453453456', '2000-09-24', 'Yo Mama'),
   (3, 2, 'sweetfruit@ab.c', 'frsw@osu.edu', '4564564567', '1989-11-23', 'Female');
--- ALL THE EVENTS STUFF --
-INSERT INTO `Events`
-(`event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`) VALUES
-(0, 1, 1, 'Valorant', 'Too lazy', '2026-02-05 08:00:00', '2026-02-05 12:00:00'),
-(1, 2, 1, 'CSGO LAN', 'Also lazy', '2026-02-05 13:30:00', '2026-02-05 17:45:00'),
-(2, 0, 1, 'Rivals', 'Weeeee', '2026-02-06 09:15:00', '2026-02-06 11:30:00'),
-(3, 1, 0, 'Book club', 'Reading Red Rising', '2026-02-06 14:00:00', '2026-02-06 18:30:00'),
-(4, 2, 0, 'Factorio', '*Cracktorio', '2026-02-07 07:45:00', '2026-02-07 11:15:00'),
-(5, 0, 0, 'Running club', 'Nyuuuuuu', '2026-02-07 12:00:00', '2026-02-07 16:00:00');
 
-INSERT INTO `VirtualEvents`
-(`event_id`, `url`) VALUES
-(0, 'discord.gg/valorantppl'),
-(2, 'discord.gg/rivalsppl'),
-(4, 'zoom.com/pretend-this-is-uuid');
-
-INSERT INTO `PhysicalEvents`
-(`event_id`, `address_id`) VALUES
-(5, 1),
-(1, 2),
-(3, 2);
+/* roles*/
+INSERT INTO Roles (role_id, name) VALUES
+  (0, 'Vainglorious Leader'),
+  (1, 'Grunt'),
+  (2, 'Infiltrator');
