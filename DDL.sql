@@ -1,7 +1,9 @@
 /*   Beaver Club (CS340) - Team 61
    Raphael Larsen and America Pacheco*/
+SET FOREIGN_KEY_CHECKS = 0;
 
 
+/* THE FIRST PART IS A MYSQL DUMP OF A SCHEMA WITHOUT DATA IN THE TABLES */
 
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19  Distrib 10.5.29-MariaDB, for Linux (x86_64)
@@ -280,3 +282,35 @@ INSERT INTO Roles (role_id, name) VALUES
   (0, 'Vainglorious Leader'),
   (1, 'Grunt'),
   (2, 'Infiltrator');
+-- MEMBERSHIP --
+INSERT INTO `membership`
+(`club_id`, `person_id`, `role_id`) VALUES
+(0, 0, 0),
+(1, 0, 2),
+(1, 1, 0),
+(0, 3, 1),
+(2, 3, 1);
+
+-- ALL THE EVENTS STUFF --
+INSERT INTO `Events`
+(`event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`) VALUES
+(0, 1, 1, 'Valorant', 'Too lazy', '2026-02-05 08:00:00', '2026-02-05 12:00:00'),
+(1, 2, 1, 'CSGO LAN', 'Also lazy', '2026-02-05 13:30:00', '2026-02-05 17:45:00'),
+(2, 0, 1, 'Rivals', 'Weeeee', '2026-02-06 09:15:00', '2026-02-06 11:30:00'),
+(3, 1, 0, 'Book club', 'Reading Red Rising', '2026-02-06 14:00:00', '2026-02-06 18:30:00'),
+(4, 2, 0, 'Factorio', '*Cracktorio', '2026-02-07 07:45:00', '2026-02-07 11:15:00'),
+(5, 0, 0, 'Running club', 'Nyuuuuuu', '2026-02-07 12:00:00', '2026-02-07 16:00:00');
+
+INSERT INTO `VirtualEvents`
+(`event_id`, `url`) VALUES
+(0, 'discord.gg/valorantppl'),
+(2, 'discord.gg/rivalsppl'),
+(4, 'zoom.com/pretend-this-is-uuid');
+
+INSERT INTO `PhysicalEvents`
+(`event_id`, `address_id`) VALUES
+(5, 1),
+(1, 2),
+(3, 2);
+
+SET FOREIGN_KEY_CHECKS = 1;
