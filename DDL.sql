@@ -1,6 +1,6 @@
 /*   Beaver Club (CS340) - Team 61
    Raphael Larsen and America Pacheco*/
-
+SET FOREIGN_KEY_CHECKS = 0;
 
 
 /*M!999999\- enable the sandbox mode */ 
@@ -274,6 +274,16 @@ INSERT INTO People (person_id, address_id, email, onid, phone_number, date_of_bi
   (1, 0, 'obama@ab.c',      'obba@osu.edu', '2342342345', '2001-04-12', 'Male'),
   (2, 1, 'president@ab.c',  'prez@osu.edu', '3453453456', '2000-09-24', 'Yo Mama'),
   (3, 2, 'sweetfruit@ab.c', 'frsw@osu.edu', '4564564567', '1989-11-23', 'Female');
+
+-- MEMBERSHIP --
+INSERT INTO `membership`
+(`club_id`, `person_id`, `role_id`) VALUES
+(0, 0, 0),
+(1, 0, 2),
+(1, 1, 0),
+(0, 3, 1),
+(2, 3, 1);
+
 -- ALL THE EVENTS STUFF --
 INSERT INTO `Events`
 (`event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`) VALUES
@@ -295,3 +305,5 @@ INSERT INTO `PhysicalEvents`
 (5, 1),
 (1, 2),
 (3, 2);
+
+SET FOREIGN_KEY_CHECKS = 1;
