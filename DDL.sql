@@ -151,7 +151,7 @@ CREATE TABLE `People` (
   `person_id` int(10) unsigned NOT NULL,
   `email` varchar(45) NOT NULL,
   `onid` varchar(45) NOT NULL,
-  `phone_numer` varchar(45) NOT NULL,
+  `phone_number` varchar(45) NOT NULL,
   `date_of_birth` date NOT NULL,
   `gender_identity` varchar(45) NOT NULL,
   `address_id` int(10) unsigned NOT NULL,
@@ -159,7 +159,7 @@ CREATE TABLE `People` (
   UNIQUE KEY `person_id_UNIQUE` (`person_id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `onid_UNIQUE` (`onid`),
-  UNIQUE KEY `phone_numer_UNIQUE` (`phone_numer`),
+  UNIQUE KEY `phone_number_UNIQUE` (`phone_number`),
   KEY `fk_People_Addresses1_idx` (`address_id`),
   CONSTRAINT `fk_People_Addresses1` FOREIGN KEY (`address_id`) REFERENCES `Addresses` (`address_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -283,7 +283,7 @@ INSERT INTO Roles (role_id, name) VALUES
   (2, 'Grunt'),
   (3, 'Infiltrator');
 -- MEMBERSHIP --
-INSERT INTO `membership`
+INSERT INTO `Membership`
 (`club_id`, `person_id`, `role_id`) VALUES
 (1, 1, 1),
 (2, 1, 3),
