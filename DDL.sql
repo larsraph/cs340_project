@@ -260,57 +260,57 @@ UNLOCK TABLES;
 
 /* clubs*/
 INSERT INTO Clubs (club_id, name, date_created, is_active) 
-VALUES (0, 'organatans', '2050-12-25', 1),
-      (1, 'slugs',      '2016-03-04', 0),
-     (2, 'beavers',    '2026-02-05', 1);
+VALUES (1, 'organatans', '2050-12-25', 1),
+      (2, 'slugs',      '2016-03-04', 0),
+     (3, 'beavers',    '2026-02-05', 1);
 
 /* addy*/
 INSERT INTO Addresses (address_id, country_code, zip_code, address_ln1, address_ln2, city, state) VALUES
-  (0, 'USA', '20500', '1600 Pennsylvania Ave', NULL, 'Washington', 'DC'),
-  (1, 'USA', '12345', '200 Abc Pl',            NULL, NULL,         NULL),
-  (2, 'USA', '56789', '666 Devil Street',      NULL, NULL,         NULL);
+  (1, 'USA', '20500', '1600 Pennsylvania Ave', NULL, 'Washington', 'DC'),
+  (2, 'USA', '12345', '200 Abc Pl',            NULL, NULL,         NULL),
+  (3, 'USA', '56789', '666 Devil Street',      NULL, NULL,         NULL);
 
 /* people*/
 INSERT INTO People (person_id, address_id, email, onid, phone_number, date_of_birth, gender_identity) VALUES
-  (0, 0, 'joebiden@ab.c',   'bijo@osu.edu', '1231231234', '1999-03-21', 'Male'),
-  (1, 0, 'obama@ab.c',      'obba@osu.edu', '2342342345', '2001-04-12', 'Male'),
-  (2, 1, 'president@ab.c',  'prez@osu.edu', '3453453456', '2000-09-24', 'Yo Mama'),
-  (3, 2, 'sweetfruit@ab.c', 'frsw@osu.edu', '4564564567', '1989-11-23', 'Female');
+  (1, 1, 'joebiden@ab.c',   'bijo@osu.edu', '1231231234', '1999-03-21', 'Male'),
+  (2, 1, 'obama@ab.c',      'obba@osu.edu', '2342342345', '2001-04-12', 'Male'),
+  (3, 2, 'president@ab.c',  'prez@osu.edu', '3453453456', '2000-09-24', 'Yo Mama'),
+  (4, 3, 'sweetfruit@ab.c', 'frsw@osu.edu', '4564564567', '1989-11-23', 'Female');
 
 /* roles*/
 INSERT INTO Roles (role_id, name) VALUES
-  (0, 'Vainglorious Leader'),
-  (1, 'Grunt'),
-  (2, 'Infiltrator');
+  (1, 'Vainglorious Leader'),
+  (2, 'Grunt'),
+  (3, 'Infiltrator');
 -- MEMBERSHIP --
 INSERT INTO `membership`
 (`club_id`, `person_id`, `role_id`) VALUES
-(0, 0, 0),
-(1, 0, 2),
-(1, 1, 0),
-(0, 3, 1),
-(2, 3, 1);
+(1, 1, 1),
+(2, 1, 3),
+(2, 2, 1),
+(1, 4, 2),
+(3, 4, 2);
 
 -- ALL THE EVENTS STUFF --
 INSERT INTO `Events`
 (`event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`) VALUES
-(0, 1, 1, 'Valorant', 'Too lazy', '2026-02-05 08:00:00', '2026-02-05 12:00:00'),
-(1, 2, 1, 'CSGO LAN', 'Also lazy', '2026-02-05 13:30:00', '2026-02-05 17:45:00'),
-(2, 0, 1, 'Rivals', 'Weeeee', '2026-02-06 09:15:00', '2026-02-06 11:30:00'),
-(3, 1, 0, 'Book club', 'Reading Red Rising', '2026-02-06 14:00:00', '2026-02-06 18:30:00'),
-(4, 2, 0, 'Factorio', '*Cracktorio', '2026-02-07 07:45:00', '2026-02-07 11:15:00'),
-(5, 0, 0, 'Running club', 'Nyuuuuuu', '2026-02-07 12:00:00', '2026-02-07 16:00:00');
+(1, 2, 2, 'Valorant', 'Too lazy', '2026-02-05 08:00:00', '2026-02-05 12:00:00'),
+(2, 3, 2, 'CSGO LAN', 'Also lazy', '2026-02-05 13:30:00', '2026-02-05 17:45:00'),
+(3, 1, 2, 'Rivals', 'Weeeee', '2026-02-06 09:15:00', '2026-02-06 11:30:00'),
+(4, 2, 1, 'Book club', 'Reading Red Rising', '2026-02-06 14:00:00', '2026-02-06 18:30:00'),
+(5, 3, 1, 'Factorio', '*Cracktorio', '2026-02-07 07:45:00', '2026-02-07 11:15:00'),
+(6, 1, 1, 'Running club', 'Nyuuuuuu', '2026-02-07 12:00:00', '2026-02-07 16:00:00');
 
 INSERT INTO `VirtualEvents`
 (`event_id`, `url`) VALUES
-(0, 'discord.gg/valorantppl'),
-(2, 'discord.gg/rivalsppl'),
-(4, 'zoom.com/pretend-this-is-uuid');
+(1, 'discord.gg/valorantppl'),
+(3, 'discord.gg/rivalsppl'),
+(5, 'zoom.com/pretend-this-is-uuid');
 
 INSERT INTO `PhysicalEvents`
 (`event_id`, `address_id`) VALUES
-(5, 1),
-(1, 2),
-(3, 2);
+(6, 2),
+(2, 3),
+(4, 3);
 
 SET FOREIGN_KEY_CHECKS = 1;
