@@ -1,4 +1,7 @@
---testing--
+/*   Beaver Club (CS340) - Team 61
+   Raphael Larsen and America Pacheco*/
+
+
 
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19  Distrib 10.5.29-MariaDB, for Linux (x86_64)
@@ -252,4 +255,22 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-02-05 15:14:36
-/*testing*/
+
+/* clubs*/
+INSERT INTO Clubs (club_id, name, date_created, is_active) 
+VALUES (0, 'organatans', '2050-12-25', 1),
+      (1, 'slugs',      '2016-03-04', 0),
+     (2, 'beavers',    '2026-02-05', 1);
+
+/* addy*/
+INSERT INTO Addresses (address_id, country_code, zip_code, address_ln1, address_ln2, city, state) VALUES
+  (0, 'USA', '20500', '1600 Pennsylvania Ave', NULL, 'Washington', 'DC'),
+  (1, 'USA', '12345', '200 Abc Pl',            NULL, NULL,         NULL),
+  (2, 'USA', '56789', '666 Devil Street',      NULL, NULL,         NULL);
+
+/*People*/
+INSERT INTO People (person_id, address_id, email, onid, phone_number, date_of_birth, gender_identity) VALUES
+  (0, 0, 'joebiden@ab.c',   'bijo@osu.edu', '1231231234', '1999-03-21', 'Male'),
+  (1, 0, 'obama@ab.c',      'obba@osu.edu', '2342342345', '2001-04-12', 'Male'),
+  (2, 1, 'president@ab.c',  'prez@osu.edu', '3453453456', '2000-09-24', 'Yo Mama'),
+  (3, 2, 'sweetfruit@ab.c', 'frsw@osu.edu', '4564564567', '1989-11-23', 'Female');
