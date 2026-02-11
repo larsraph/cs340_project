@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beaver Clubs</title>
+</head>
+<body>
+    <div id="table-container"></div>
+
+
+    <style>
+        table {
+            border: 5px solid red;
+            * {
+                border: 2px solid green;
+            }
+            input, span {
+                border: none;
+            }
+        }
+
+        .selected {
+            background-color: green;
+            color: white;
+        }
+    </style>
+
+    
+    <script>
+        function tables(data) {
+            const vtable = [];
+
+            const table = document.createElement('table');
+            const head = document.createElement('thead');
+            const body = document.createElement('tbody');
+            
+            table.appendChild(head);
+            table.appendChild(body);
+            
+            const h_row = document.createElement('tr');
+            head.appendChild(h_row);
+
+            const length = Object.keys(data[0]).length;
+
+            const keys = Object.keys(data[0]);
+            for (var i = 0; i < length; i++) {
+                const key = keys[i];
+                
+                const th = document.createElement('th');
+                th.textContent = key;
+                
+                h_row.appendChild(th);
+            }
+
+            for (const row of data) {
+                const b_row = document.createElement('tr');
+                body.appendChild(b_row);
+
+                for (var i = 0; i < length; i++) {
+                    let value = row[keys[i]];
+
+                    const td = document.createElement('td');
+                    const txt = document.createElement('span');
+                    txt.textContent = value;
+                    td.appendChild(txt);
+
+                    b_row.appendChild(td);
+                    vtable.push([td, txt]);
+                }
+            }
+            return [table, vtable, length];
+        }
+
+        function rem_euclid(a, b) {
+            return ((a % b) + b) % b;
+        }
+
+        // replace with DB query
+        const data = [
+            { id: 1, name: "Dummy", age: 25 },
+            { id: 2, name: "Data", age: 30 },
+            { id: 3, name: "From", age: 28 },
+            { id: 4, name: "JS", age: 22 },
+        ];
+
+        const [table, vtable, length] = tables(data);
+        var selected_pos = 0;
+        vtable[selected_pos][0].classList.add('selected');
+        table.tabIndex = -1;
+
+        const input = document.createElement('input');
+        var editing = false;
+        input.hidden = true;
+
+        var shift_pressed = false;
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Shift') {
+                shift_pressed = true;
+            }
+        });
+        window.addEventListener('keyup', (event) => {
+            if (event.key === 'Shift') {
+                shift_pressed = false;
+            }
+        });
+
+        function update_selected(ltd) {
+            selected_pos = rem_euclid(selected_pos, vtable.length);
+            ltd.classList.remove('selected');
+            vtable[selected_pos][0].classList.add('selected');
+        }
+
+        function enter_editing(value, ltxt) {
+            editing = true;
+
+            input.hidden = false;
+            ltxt.hidden = true;
+
+            vtable[selected_pos][0].appendChild(input);
+            input.value = value;
+            input.focus();
+        }
+
+        function exit_editing(ltxt) {
+            editing = false;
+
+            input.hidden = true;
+            ltxt.hidden = false;
+            
+            table.focus();
+        }
+
+        table.addEventListener('keydown', (event) => {
+            if (selected_pos === null) return;
+
+            const [ltd, ltxt] = vtable[selected_pos];
+            
+            if (editing) {
+                if (event.key === 'Enter') {
+                    if (shift_pressed) {
+                        selected_pos -= length;
+                    } else {
+                        selected_pos += length;
+                    }
+                } else if (event.key === 'Tab') {
+                    if (shift_pressed) {
+                        selected_pos -= 1;
+                    } else {
+                        selected_pos += 1;
+                    }
+                } else if (event.key === 'Escape') {} else {
+                    return;
+                }
+
+                event.preventDefault();
+                exit_editing(ltxt);
+                update_selected(ltd);
+            } else {
+                if (event.key === 'Tab') {
+                    if (shift_pressed) {
+                        selected_pos -= 1;
+                    } else {
+                        selected_pos += 1;
+                    }
+                } else if (event.key === 'ArrowUp') {
+                    selected_pos -= length;
+                } else if (event.key === 'ArrowDown') {
+                    selected_pos += length;
+                } else if (event.key === 'ArrowLeft') {
+                    selected_pos -= 1;
+                } else if (event.key === 'ArrowRight') {
+                    selected_pos += 1;
+                } else if (event.key === 'Escape') { // todo short circuit all action keys
+                    return;
+                } else if (event.key === 'Enter') {
+                    enter_editing(ltxt.textContent, ltxt);
+                    event.preventDefault();
+                    input.select();
+                    return;
+                } else {
+                    enter_editing('', ltxt);
+                    return;
+                }
+
+                event.preventDefault();
+                update_selected(ltd);
+            }
+        });
+
+        document.getElementById('table-container').appendChild(table);
+    </script>
+</body>
+</html>
