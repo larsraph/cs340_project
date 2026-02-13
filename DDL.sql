@@ -148,7 +148,7 @@ DROP TABLE IF EXISTS `People`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `People` (
-  `person_id` int(10) unsigned NOT NULL,
+  `person_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(45) NOT NULL,
   `onid` varchar(45) NOT NULL,
   `phone_number` varchar(45) NOT NULL,
