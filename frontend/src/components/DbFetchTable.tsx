@@ -8,7 +8,7 @@ type DbFetchTableProps = {
 
 const DbFetchTable = (props: DbFetchTableProps) => {
   const [data] = createResource(() => props.table, async (table) => {
-    const response = await fetch(`http://localhost:3000/api/${table}`);
+    const response = await fetch(`/api/${table}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch table data: ${response.statusText}`);
     }
