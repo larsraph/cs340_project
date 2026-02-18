@@ -1,81 +1,90 @@
-use std::any::{Any, TypeId};
-use std::collections::HashMap;
-use std::os::windows::io::FromRawHandle;
-use std::pin::Pin;
+use mysql::prelude::*;
+use mysql::*;
 
-use any_vec::any_value::AnyValue;
-use any_vec::AnyVec;
-use chrono::Local;
-use futures::StreamExt;
-use leptos::html::Col;
-use leptos::prelude::*;
-use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
-use leptos_router::components::{Route, Router, Routes};
-use leptos_router::StaticSegment;
-use polars::frame::DataFrame;
-use polars::prelude::{Column, DataType, NamedFrom, TimeUnit, TimeZone, UnknownKind};
-use polars::series::Series;
-use serde::{Deserialize, Serialize};
-use sqlx::mysql::{MySqlRow, MySqlTypeInfo};
-use sqlx::{Column as _, FromRow, MySql, Row, TypeInfo};
+fn a() {
+    let url = "mysql://root:password@localhost:3307/db_name";
+    let pool = Pool::new(url)?;
+    let mut conn = pool.get_conn()?;
 
-pub fn shell(options: LeptosOptions) -> impl IntoView {
-    view! {
-        <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <meta charset="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <AutoReload options=options.clone() />
-                <HydrationScripts options />
-                <MetaTags />
-            </head>
-            <body>
-                <App />
-            </body>
-        </html>
+    // Let's create a table for payments.
+    conn.query_drop(
+        r"CREATE TEMPORARY TABLE payment (
+            customer_id int not null,
+            amount int not null,
+            account_name text
+        )",
+    )?;
+
+    struct Payment {
+        customer_id: i32,
+        amount: i32,
+        account_name: Option<String>,
     }
-}
 
-#[component]
-pub fn App() -> impl IntoView {
-    provide_meta_context();
+    let payments = vec![
+        Payment {
+            customer_id: 1,
+            amount: 2,
+            account_name: None,
+        },
+        Payment {
+            customer_id: 3,
+            amount: 4,
+            account_name: Some("foo".into()),
+        },
+        Payment {
+            customer_id: 5,
+            amount: 6,
+            account_name: None,
+        },
+        Payment {
+            customer_id: 7,
+            amount: 8,
+            account_name: None,
+        },
+        Payment {
+            customer_id: 9,
+            amount: 10,
+            account_name: Some("bar".into()),
+        },
+    ];
 
-    view! {
-        <Stylesheet id="leptos" href="/pkg/website.css" />
+    conn.exec_batch(
+        r"INSERT INTO payment (customer_id, amount, account_name)
+          VALUES (:customer_id, :amount, :account_name)",
+        payments.iter().map(|p| {
+            params! {
+                "customer_id" => p.customer_id,
+                "amount" => p.amount,
+                "account_name" => &p.account_name,
+            }
+        }),
+    )?;
+    // Let's select payments from database. Type inference should do the trick here.
+    let selected_payments: Vec<Row> = conn.exec(
+        "SELECT customer_id, amount, account_name from payment",
+        |(customer_id, amount, account_name)| Payment {
+            customer_id,
+            amount,
+            account_name,
+        },
+    )?;
 
-        <Title text="Welcome to Leptos" />
-
-        <Router>
-            <main>
-                <Routes fallback=|| "Page not found.".into_view()>
-                    <Route path=StaticSegment("") view=HomePage />
-                </Routes>
-            </main>
-        </Router>
+    let r = selected_payments[0];
+    let cols = r.columns();
+    let col = cols[0];
+    col.
+    use mysql::consts::ColumnType as CT;
+    match col.column_type() {
+        CT::
     }
-}
+    let v: Value = r.get(0).unwrap();
 
-#[component]
-fn HomePage() -> impl IntoView {
-    let count = RwSignal::new(0);
+    let a = v
 
-    // let res = Resource::new(|| (), |_| select_people());
-
-    // let view = move || {
-    //     res.get()
-    //         .map(|res| res.map(|ppl| ppl.into_iter().map(|person| person.row()).collect_view()))
-    // };
-
-    view! {
-        <h1>"Welcome to Leptos!"</h1>
-        <button on:click=move |_| *count.write() += 1>"Click Me: " {count}</button>
-        <Suspense fallback=|| view! { "Loading" }>
-            <table>
-                <tbody></tbody>
-            </table>
-        </Suspense>
-    }
+    // assert_eq!(payments, selected_payments);
+    // println!("Yay!");
+    // Ok(())
 }
 
 macro_rules! call_with {
