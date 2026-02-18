@@ -28,12 +28,11 @@ hydrate = [
   "dep:console_error_panic_hook",
   "dep:wasm-bindgen",
 ]
-mysql_async = ["dep:mysql_async"]
 ssr = [
+  "dep:mysql_async",
   "dep:axum",
   "dep:tokio",
   "dep:leptos_axum",
-  "dep:mysql_async",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
