@@ -31,18 +31,6 @@ pub async fn fetch(ty: TableType) -> Result<Table, ServerFnError> {
     }
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
-pub enum TableType {
-    Person,
-    Clubs,
-    Roles,
-    Membership,
-    Events,
-    PhysicalEvents,
-    VirtualEvents,
-    Address,
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Table {
     Person(Vec<Person>),
