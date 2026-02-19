@@ -1,6 +1,7 @@
 use chrono::{NaiveDate, NaiveDateTime};
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
+use struct_field_names_as_array::FieldNamesAsSlice;
 
 #[server]
 pub async fn fetch(ty: TableType) -> Result<Table, ServerFnError> {
@@ -58,61 +59,21 @@ impl Table {
     pub fn view(self) -> impl IntoView {
         use Table as TB;
         match self {
-            TB::Person(mut data) => view! {
-                <Table
-                    head=Person::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::Person(mut data) => view! { <Table head=Person::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
-            TB::Clubs(mut data) => view! {
-                <Table
-                    head=Clubs::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::Clubs(mut data) => view! { <Table head=Clubs::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
-            TB::Roles(mut data) => view! {
-                <Table
-                    head=Roles::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::Roles(mut data) => view! { <Table head=Roles::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
-            TB::Membership(mut data) => view! {
-                <Table
-                    head=Membership::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::Membership(mut data) => view! { <Table head=Membership::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
-            TB::Events(mut data) => view! {
-                <Table
-                    head=Events::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::Events(mut data) => view! { <Table head=Events::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
-            TB::PhysicalEvents(mut data) => view! {
-                <Table
-                    head=PhysicalEvents::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::PhysicalEvents(mut data) => view! { <Table head=PhysicalEvents::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
-            TB::VirtualEvents(mut data) => view! {
-                <Table
-                    head=VirtualEvents::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::VirtualEvents(mut data) => view! { <Table head=VirtualEvents::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
-            TB::Address(mut data) => view! {
-                <Table
-                    head=Address::head()
-                    body=data.drain(..).map(TableTrait::data)
-                />
-            }
+            TB::Address(mut data) => view! { <Table head=Address::head() body=data.drain(..).map(TableTrait::data) /> }
             .into_any(),
         }
     }
@@ -122,17 +83,14 @@ impl Table {
 pub fn Table(head: impl IntoView, body: impl IntoIterator<Item: IntoView>) -> impl IntoView {
     view! {
         <table>
-            <thead>
-                {head}
-            </thead>
-            <tbody>
-                {body.into_iter().collect_view()}
-            </tbody>
+            <thead>{head}</thead>
+            <tbody>{body.into_iter().collect_view()}</tbody>
         </table>
     }
 }
 
 trait TableTrait {
+    #[cfg(feature = "ssr")]
     const NAME: &str;
 
     fn head() -> impl IntoView;
@@ -143,6 +101,7 @@ trait TableTrait {
 macro_rules! table_trait {
     ($ty:ty, $name:literal, [$( $field:ident ),*]) => {
         impl TableTrait for $ty {
+            #[cfg(feature = "ssr")]
             const NAME: &str = $name;
 
             fn head() -> impl IntoView {
@@ -186,7 +145,15 @@ table_trait!(Membership, "Membership", [person_id, role_id, club_id]);
 table_trait!(
     Events,
     "Events",
-    [event_id, name, description, time_start, time_end]
+    [
+        event_id,
+        name,
+        description,
+        time_start,
+        time_end,
+        club_id,
+        organizer_id
+    ]
 );
 table_trait!(PhysicalEvents, "PhysicalEvents", [event_id, address_id]);
 table_trait!(VirtualEvents, "VirtualEvents", [event_id, url]);
@@ -204,7 +171,7 @@ table_trait!(
     ]
 );
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Person {
     person_id: i32,
@@ -215,7 +182,7 @@ pub struct Person {
     address_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Clubs {
     club_id: i32,
@@ -224,14 +191,14 @@ pub struct Clubs {
     is_active: bool,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Roles {
     role_id: i32,
     name: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Membership {
     person_id: i32,
@@ -239,7 +206,7 @@ pub struct Membership {
     club_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Events {
     event_id: i32,
@@ -251,21 +218,21 @@ pub struct Events {
     organizer_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct PhysicalEvents {
     event_id: i32,
     address_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct VirtualEvents {
     event_id: i32,
     url: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Address {
     address_id: i32,
