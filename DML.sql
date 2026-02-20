@@ -11,16 +11,16 @@ FROM `People`;
 SELECT `role_id`, `name`
 FROM `Roles`;
 
-SELECT `membership_id`, `club_id`, `person_id`, `role_id`
+SELECT `club_id`, `person_id`, `role_id`
 FROM `Membership`;
 
 SELECT `event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`
 FROM `Events`;
 
-SELECT `virtual_event_id`, `event_id`, `url`
+SELECT `event_id`, `url`
 FROM `VirtualEvents`;
 
-SELECT `physical_event_id`, `event_id`, `address_id`
+SELECT `event_id`, `address_id`
 FROM `PhysicalEvents`;
 
 -- Full setters (pk excluded)
@@ -58,19 +58,7 @@ WHERE `address_id` = @address_id;
 DELETE FROM `People` 
 WHERE `person_id` = @person_id;
 
-DELETE FROM `Roles` 
-WHERE `role_id` = @role_id;
-
-DELETE FROM `Membership` 
-WHERE `membership_id` = @membership_id;
-
 DELETE FROM `Events` 
-WHERE `event_id` = @event_id;
-
-DELETE FROM `VirtualEvents` 
-WHERE `event_id` = @event_id;
-
-DELETE FROM `PhysicalEvents` 
 WHERE `event_id` = @event_id;
 
 -- Full updaters (pk excluded)
@@ -90,12 +78,8 @@ UPDATE `Roles`
 SET `name` = @role_name
 WHERE `role_id` = @role_id;
 
-UPDATE `Membership`
-SET `club_id` = @club_id, `person_id` = @person_id, `role_id` = @role_id
-WHERE `membership_id` = @membership_id;
-
 UPDATE `Events`
-SET `club_id` = @club_id, `organizer_id` = @organizer, `name` = @event_name, `description` = @description, `time_start` = @time_start, `time_end` = @time_end
+SET `club_id` = @club_id, `organizer_id` = @organizer_id, `name` = @event_name, `description` = @description, `time_start` = @time_start, `time_end` = @time_end
 WHERE `event_id` = @event_id;
 
 UPDATE `VirtualEvents`
