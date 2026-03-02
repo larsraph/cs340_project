@@ -3,8 +3,8 @@ use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::components::{Route, Router, Routes};
 use leptos_router::StaticSegment;
 
-use crate::sheet::Sheet;
-use crate::tables::Person;
+// use crate::sheet::Sheet;
+// use crate::tables::Person;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -45,7 +45,7 @@ pub fn App() -> impl IntoView {
 
 #[component]
 fn HomePage() -> impl IntoView {
-    // use crate::tables::TableType as TT;
+    // use crate::tables::Ty as TT;
 
     // let (tt, set_tt) = signal(TT::Person);
 
@@ -64,9 +64,9 @@ fn HomePage() -> impl IntoView {
     // let render_table = move || table.get().map(|table| table.map(|table| table.view()));
 
     view! {
-        // <h1>"Welcome to Leptos!"</h1>
+        <h1>"Welcome to Leptos!"</h1>
         // <button on:click=cycle>"Click Me: " {move || format!("{:?}", tt.get())}</button>
         // <Transition fallback="Loading...".into_view()>{render_table}</Transition>
-        <Sheet<Person>></Sheet>
+        // <Sheet<Person>></Sheet>
     }
 }

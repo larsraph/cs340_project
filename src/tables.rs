@@ -1,7 +1,18 @@
 use chrono::{NaiveDate, NaiveDateTime};
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
-use struct_field_names_as_array::FieldNamesAsSlice;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TableType {
+    Person,
+    Clubs,
+    Roles,
+    Membership,
+    Events,
+    PhysicalEvents,
+    VirtualEvents,
+    Address,
+}
 
 #[server]
 pub async fn fetch(ty: TableType) -> Result<Table, ServerFnError> {
@@ -159,7 +170,7 @@ table_trait!(
     ]
 );
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Person {
     person_id: i32,
@@ -170,7 +181,7 @@ pub struct Person {
     address_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Clubs {
     club_id: i32,
@@ -179,14 +190,14 @@ pub struct Clubs {
     is_active: bool,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Roles {
     role_id: i32,
     name: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Membership {
     person_id: i32,
@@ -194,7 +205,7 @@ pub struct Membership {
     club_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Events {
     event_id: i32,
@@ -206,21 +217,21 @@ pub struct Events {
     organizer_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct PhysicalEvents {
     event_id: i32,
     address_id: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct VirtualEvents {
     event_id: i32,
     url: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, FieldNamesAsSlice)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(mysql_async::prelude::FromRow))]
 pub struct Address {
     address_id: i32,

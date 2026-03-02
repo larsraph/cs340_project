@@ -1,597 +1,423 @@
-mod types {
-    use std::mem::MaybeUninit;
+// mod types {
+//     use std::mem::MaybeUninit;
 
-    use bitvec::prelude::*;
-    use chrono::{NaiveDate, NaiveDateTime};
-    use serde::de::VariantAccess;
-    use serde::ser::{SerializeSeq, SerializeStruct, SerializeTupleVariant};
-    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+//     use bitvec::prelude::*;
+//     use chrono::{NaiveDate, NaiveDateTime};
+//     use serde::{Deserialize, Serialize};
+//     use {Type as T, Value as V, ValueColumnInner as C};
 
-    #[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
-    enum Type {
-        U8,
-        I32,
-        Date,
-        DateTime,
-        String,
-    }
+//     // should expand to become
+//     // #[derive(Clone, Debug, Serialize, Deserialize)]
+//     // pub enum Value {
+//     //     U8(u8),
+//     //     I32(i32),
+//     //     String(String),
+//     //     Date(NaiveDate),
+//     //     DateTime(NaiveDateTime),
+//     // }
 
-    #[derive(Clone, Debug, Serialize, Deserialize)]
-    pub enum Value {
-        U8(u8),
-        I32(i32),
-        String(String),
-        Date(NaiveDate),
-        DateTime(NaiveDateTime),
-    }
+//     // typed! {
+//     //     #[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
+//     //     pub struct Type();
+//     // }
+//     // // should expand to become
+//     // #[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
+//     // pub enum Type {
+//     //     U8,
+//     //     I32,
+//     //     Date,
+//     //     DateTime,
+//     //     String,
+//     // }
 
-    #[derive(Debug)]
-    pub enum ValueColumnInner {
-        U8(Vec<MaybeUninit<u8>>),
-        I32(Vec<MaybeUninit<i32>>),
-        String(Vec<MaybeUninit<String>>),
-        Date(Vec<MaybeUninit<NaiveDate>>),
-        DateTime(Vec<MaybeUninit<NaiveDateTime>>),
-    }
+//     // typed! {
+//     //     #[derive(Debug)]
+//     //     pub struct ValueVec(Vec<$ty>);
+//     // }
+//     // // should expand to become
+//     // #[derive(Debug)]
+//     // pub enum ValueVec {
+//     //     U8(Vec<u8>),
+//     //     I32(Vec<i32>),
+//     //     String(Vec<String>),
+//     //     Date(Vec<NaiveDate>),
+//     //     DateTime(Vec<NaiveDateTime>),
+//     // }
 
-    impl ValueColumnInner {
-        pub fn push_uninit(&mut self) {
-            match self {
-                ValueColumnInner::U8(col) => col.push(MaybeUninit::uninit()),
-                ValueColumnInner::I32(col) => col.push(MaybeUninit::uninit()),
-                ValueColumnInner::String(col) => col.push(MaybeUninit::uninit()),
-                ValueColumnInner::Date(col) => col.push(MaybeUninit::uninit()),
-                ValueColumnInner::DateTime(col) => col.push(MaybeUninit::uninit()),
-            }
-        }
+//     #[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
+//     pub enum Type {
+//         U8,
+//         I32,
+//         Date,
+//         DateTime,
+//         String,
+//     }
 
-        pub fn len(&self) -> usize {
-            match self {
-                ValueColumnInner::U8(col) => col.len(),
-                ValueColumnInner::I32(col) => col.len(),
-                ValueColumnInner::String(col) => col.len(),
-                ValueColumnInner::Date(col) => col.len(),
-                ValueColumnInner::DateTime(col) => col.len(),
-            }
-        }
-    }
+//     #[derive(Clone, Debug, Serialize, Deserialize)]
+//     pub enum Value {
+//         U8(u8),
+//         I32(i32),
+//         String(String),
+//         Date(NaiveDate),
+//         DateTime(NaiveDateTime),
+//     }
 
-    #[derive(Debug)]
-    pub struct ValueColumn {
-        pub values: ValueColumnInner,
-        pub nulls: Option<BitVec>,
-    }
+//     pub enum ValueRef<'a> {
+//         U8(&'a u8),
+//         I32(&'a i32),
+//         String(&'a str),
+//         Date(&'a NaiveDate),
+//         DateTime(&'a NaiveDateTime),
+//     }
 
-    impl ValueColumn {
-        pub fn push(&mut self, value: Option<Value>) {
-            match (value, &mut self.values, &mut self.nulls) {
-                (Some(Value::U8(v)), ValueColumnInner::U8(col), nulls) => {
-                    col.push(MaybeUninit::new(v));
-                    nulls.as_mut().map(|nulls| nulls.push(false));
-                }
-                (Some(Value::I32(v)), ValueColumnInner::I32(col), nulls) => {
-                    col.push(MaybeUninit::new(v));
-                    nulls.as_mut().map(|nulls| nulls.push(false));
-                }
-                (Some(Value::String(v)), ValueColumnInner::String(col), nulls) => {
-                    col.push(MaybeUninit::new(v));
-                    nulls.as_mut().map(|nulls| nulls.push(false));
-                }
-                (Some(Value::Date(v)), ValueColumnInner::Date(col), nulls) => {
-                    col.push(MaybeUninit::new(v));
-                    nulls.as_mut().map(|nulls| nulls.push(false));
-                }
-                (Some(Value::DateTime(v)), ValueColumnInner::DateTime(col), nulls) => {
-                    col.push(MaybeUninit::new(v));
-                    nulls.as_mut().map(|nulls| nulls.push(false));
-                }
-                (None, col, Some(nulls)) => {
-                    col.push_uninit();
-                    nulls.push(true);
-                }
-                _ => panic!("mismatched value type"),
-            }
-        }
+//     #[derive(Debug)]
+//     pub enum ValueColumnInner {
+//         U8(Vec<MaybeUninit<u8>>),
+//         I32(Vec<MaybeUninit<i32>>),
+//         String(Vec<MaybeUninit<String>>),
+//         Date(Vec<MaybeUninit<NaiveDate>>),
+//         DateTime(Vec<MaybeUninit<NaiveDateTime>>),
+//     }
 
-        pub fn empty_u8(not_null: bool) -> Self {
-            ValueColumn {
-                values: ValueColumnInner::U8(Vec::new()),
-                nulls: not_null.then(BitVec::new),
-            }
-        }
+//     impl ValueColumnInner {
+//         pub fn push_uninit(&mut self) {
+//             match self {
+//                 C::U8(col) => col.push(MaybeUninit::uninit()),
+//                 C::I32(col) => col.push(MaybeUninit::uninit()),
+//                 C::String(col) => col.push(MaybeUninit::uninit()),
+//                 C::Date(col) => col.push(MaybeUninit::uninit()),
+//                 C::DateTime(col) => col.push(MaybeUninit::uninit()),
+//             }
+//         }
 
-        pub fn empty_i32(not_null: bool) -> Self {
-            ValueColumn {
-                values: ValueColumnInner::I32(Vec::new()),
-                nulls: not_null.then(BitVec::new),
-            }
-        }
+//         pub fn len(&self) -> usize {
+//             match self {
+//                 C::U8(col) => col.len(),
+//                 C::I32(col) => col.len(),
+//                 C::String(col) => col.len(),
+//                 C::Date(col) => col.len(),
+//                 C::DateTime(col) => col.len(),
+//             }
+//         }
+//     }
 
-        pub fn empty_string(not_null: bool) -> Self {
-            ValueColumn {
-                values: ValueColumnInner::String(Vec::new()),
-                nulls: not_null.then(BitVec::new),
-            }
-        }
+//     #[derive(Debug)]
+//     pub struct ValueColumn {
+//         pub inner: ValueColumnInner,
+//         pub nulls: Option<BitVec>,
+//     }
 
-        pub fn empty_date(not_null: bool) -> Self {
-            ValueColumn {
-                values: ValueColumnInner::Date(Vec::new()),
-                nulls: not_null.then(BitVec::new),
-            }
-        }
+//     impl ValueColumn {
+//         pub fn push(&mut self, value: Option<Value>) {
+//             fn _push<T>(col: &mut Vec<MaybeUninit<T>>, value: T, nulls: &mut Option<BitVec>) {
+//                 col.push(MaybeUninit::new(value));
+//                 if let Some(nulls) = nulls {
+//                     nulls.push(false);
+//                 }
+//             }
 
-        pub fn empty_datetime(not_null: bool) -> Self {
-            ValueColumn {
-                values: ValueColumnInner::DateTime(Vec::new()),
-                nulls: not_null.then(BitVec::new),
-            }
-        }
-    }
+//             match (value, &mut self.inner, &mut self.nulls) {
+//                 (Some(V::U8(v)), C::U8(c), n) => _push(c, v, n),
+//                 (Some(V::I32(v)), C::I32(c), n) => _push(c, v, n),
+//                 (Some(V::String(v)), C::String(c), n) => _push(c, v, n),
+//                 (Some(V::Date(v)), C::Date(c), n) => _push(c, v, n),
+//                 (Some(V::DateTime(v)), C::DateTime(c), n) => _push(c, v, n),
+//                 (None, c, Some(n)) => {
+//                     c.push_uninit();
+//                     n.push(true);
+//                 }
+//                 _ => panic!("value type does not match column type"),
+//             }
+//         }
 
-    impl Clone for ValueColumn {
-        fn clone(&self) -> Self {
-            match &self.values {
-                ValueColumnInner::U8(vals) => Self {
-                    values: ValueColumnInner::U8(vals.clone()),
-                    nulls: self.nulls.clone(),
-                },
-                ValueColumnInner::I32(vals) => Self {
-                    values: ValueColumnInner::I32(vals.clone()),
-                    nulls: self.nulls.clone(),
-                },
-                ValueColumnInner::Date(vals) => Self {
-                    values: ValueColumnInner::Date(vals.clone()),
-                    nulls: self.nulls.clone(),
-                },
-                ValueColumnInner::DateTime(vals) => Self {
-                    values: ValueColumnInner::DateTime(vals.clone()),
-                    nulls: self.nulls.clone(),
-                },
-                ValueColumnInner::String(vals) => {
-                    if let Some(nulls) = &self.nulls {
-                        return ValueColumn {
-                            values: ValueColumnInner::String(
-                                vals.iter()
-                                    .zip(nulls.iter())
-                                    .map(|(v, is_null)| {
-                                        if *is_null {
-                                            MaybeUninit::uninit()
-                                        } else {
-                                            unsafe { MaybeUninit::new(v.assume_init_ref().clone()) }
-                                        }
-                                    })
-                                    .collect(),
-                            ),
-                            nulls: Some(nulls.clone()),
-                        };
-                    } else {
-                        return ValueColumn {
-                            values: ValueColumnInner::String(
-                                vals.iter()
-                                    .map(|v| unsafe {
-                                        MaybeUninit::new(v.assume_init_ref().clone())
-                                    })
-                                    .collect(),
-                            ),
-                            nulls: None,
-                        };
-                    }
-                }
-            }
-        }
-    }
+//         pub const fn empty(ty: Type, not_null: bool) -> Self {
+//             let inner = match ty {
+//                 T::U8 => C::U8(Vec::new()),
+//                 T::I32 => C::I32(Vec::new()),
+//                 T::String => C::String(Vec::new()),
+//                 T::Date => C::Date(Vec::new()),
+//                 T::DateTime => C::DateTime(Vec::new()),
+//             };
+//             let nulls = if not_null { None } else { Some(BitVec::EMPTY) };
+//             Self { inner, nulls }
+//         }
 
-    impl Serialize for ValueColumn {
-        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
-        {
-            struct Values<'a>(&'a ValueColumn);
+//         pub fn iter(&self) -> IterTy<'_> {
+//             fn _iter<'a, T>(col: &'a [MaybeUninit<T>], nulls: &'a Option<BitVec>) -> Iter<'a, T> {
+//                 if let Some(nulls) = nulls {
+//                     Iter::Nullable(NullableIter {
+//                         index: 0,
+//                         data: col,
+//                         nulls,
+//                     })
+//                 } else {
+//                     Iter::NotNull(NotNullIter {
+//                         index: 0,
+//                         data: unsafe { col.assume_init_ref() },
+//                     })
+//                 }
+//             }
 
-            impl<'a> Serialize for Values<'a> {
-                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-                where
-                    S: Serializer,
-                {
-                    let mut seq = serializer.serialize_seq(Some(self.0.values.len()))?;
+//             match &self.inner {
+//                 C::U8(col) => IterTy::U8(_iter(col, &self.nulls)),
+//                 C::I32(col) => IterTy::I32(_iter(col, &self.nulls)),
+//                 C::String(col) => IterTy::String(_iter(col, &self.nulls)),
+//                 C::Date(col) => IterTy::Date(_iter(col, &self.nulls)),
+//                 C::DateTime(col) => IterTy::DateTime(_iter(col, &self.nulls)),
+//             }
+//         }
+//     }
 
-                    if let Some(nulls) = &self.0.nulls {
-                        match &self.0.values {
-                            ValueColumnInner::U8(vals) => {
-                                for (mu, is_null) in vals.iter().zip(nulls.iter()) {
-                                    if *is_null {
-                                        seq.serialize_element(&None::<u8>)?;
-                                    } else {
-                                        seq.serialize_element(&Some(unsafe {
-                                            mu.assume_init_ref()
-                                        }))?;
-                                    }
-                                }
-                            }
-                            ValueColumnInner::I32(vals) => {
-                                for (mu, is_null) in vals.iter().zip(nulls.iter()) {
-                                    if *is_null {
-                                        seq.serialize_element(&None::<i32>)?;
-                                    } else {
-                                        seq.serialize_element(&Some(unsafe {
-                                            mu.assume_init_ref()
-                                        }))?;
-                                    }
-                                }
-                            }
-                            ValueColumnInner::Date(vals) => {
-                                for (mu, is_null) in vals.iter().zip(nulls.iter()) {
-                                    if *is_null {
-                                        seq.serialize_element(&None::<NaiveDate>)?;
-                                    } else {
-                                        seq.serialize_element(&Some(unsafe {
-                                            mu.assume_init_ref()
-                                        }))?;
-                                    }
-                                }
-                            }
-                            ValueColumnInner::DateTime(vals) => {
-                                for (mu, is_null) in vals.iter().zip(nulls.iter()) {
-                                    if *is_null {
-                                        seq.serialize_element(&None::<NaiveDateTime>)?;
-                                    } else {
-                                        seq.serialize_element(&Some(unsafe {
-                                            mu.assume_init_ref()
-                                        }))?;
-                                    }
-                                }
-                            }
-                            ValueColumnInner::String(vals) => {
-                                for (mu, is_null) in vals.iter().zip(nulls.iter()) {
-                                    if *is_null {
-                                        seq.serialize_element(&None::<String>)?;
-                                    } else {
-                                        seq.serialize_element(&Some(unsafe {
-                                            mu.assume_init_ref()
-                                        }))?;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        match &self.0.values {
-                            ValueColumnInner::U8(vals) => {
-                                for mu in vals.iter() {
-                                    seq.serialize_element(unsafe { mu.assume_init_ref() })?;
-                                }
-                            }
-                            ValueColumnInner::I32(vals) => {
-                                for mu in vals.iter() {
-                                    seq.serialize_element(unsafe { mu.assume_init_ref() })?;
-                                }
-                            }
-                            ValueColumnInner::Date(vals) => {
-                                for mu in vals.iter() {
-                                    seq.serialize_element(unsafe { mu.assume_init_ref() })?;
-                                }
-                            }
-                            ValueColumnInner::DateTime(vals) => {
-                                for mu in vals.iter() {
-                                    seq.serialize_element(unsafe { mu.assume_init_ref() })?;
-                                }
-                            }
-                            ValueColumnInner::String(vals) => {
-                                for mu in vals.iter() {
-                                    seq.serialize_element(unsafe { mu.assume_init_ref() })?;
-                                }
-                            }
-                        }
-                    }
+//     impl Clone for ValueColumn {
+//         fn clone(&self) -> Self {
+//             let nulls = self.nulls.clone();
 
-                    seq.end()
-                }
-            }
+//             fn owning<T: Clone>(
+//                 vals: &[MaybeUninit<T>],
+//                 nulls: &Option<BitVec>,
+//             ) -> Vec<MaybeUninit<T>> {
+//                 if let Some(nulls) = nulls {
+//                     vals.iter()
+//                         .zip(nulls.iter())
+//                         .map(|(v, is_null)| {
+//                             if *is_null {
+//                                 MaybeUninit::uninit()
+//                             } else {
+//                                 MaybeUninit::new(unsafe { v.assume_init_ref() }.clone())
+//                             }
+//                         })
+//                         .collect()
+//                 } else {
+//                     vals.iter()
+//                         .map(|v| MaybeUninit::new(unsafe { v.assume_init_ref() }.clone()))
+//                         .collect()
+//                 }
+//             }
 
-            let mut st = match &self.values {
-                ValueColumnInner::U8(_) => {
-                    serializer.serialize_tuple_variant("ValueColumn", 0, "U8", 1)?
-                }
-                ValueColumnInner::I32(_) => {
-                    serializer.serialize_tuple_variant("ValueColumn", 1, "I32", 1)?
-                }
-                ValueColumnInner::Date(_) => {
-                    serializer.serialize_tuple_variant("ValueColumn", 2, "Date", 1)?
-                }
-                ValueColumnInner::DateTime(_) => {
-                    serializer.serialize_tuple_variant("ValueColumn", 3, "DateTime", 1)?
-                }
-                ValueColumnInner::String(_) => {
-                    serializer.serialize_tuple_variant("ValueColumn", 4, "String", 1)?
-                }
-            };
+//             let inner = match &self.inner {
+//                 C::U8(vals) => C::U8(vals.clone()),
+//                 C::I32(vals) => C::I32(vals.clone()),
+//                 C::Date(vals) => C::Date(vals.clone()),
+//                 C::DateTime(vals) => C::DateTime(vals.clone()),
+//                 C::String(vals) => C::String(owning(vals, &nulls)),
+//             };
 
-            st.serialize_field(&Values(self))?;
+//             Self { inner, nulls }
+//         }
+//     }
 
-            st.end()
-        }
-    }
+//     pub enum IterTy<'a> {
+//         U8(Iter<'a, u8>),
+//         I32(Iter<'a, i32>),
+//         String(Iter<'a, String>),
+//         Date(Iter<'a, NaiveDate>),
+//         DateTime(Iter<'a, NaiveDateTime>),
+//     }
 
-    impl<'de> Deserialize<'de> for ValueColumn {
-        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
-        {
-            use serde::de::{self, SeqAccess, Visitor};
+//     #[derive(Clone, Copy, Debug)]
+//     pub enum Iter<'a, T> {
+//         NotNull(NotNullIter<'a, T>),
+//         Nullable(NullableIter<'a, T>),
+//     }
 
-            struct ValueColumnVisitor;
+//     #[derive(Clone, Copy, Debug, Serialize)]
+//     pub struct NotNullIter<'a, T> {
+//         data: &'a [T],
+//     }
 
-            impl<'de> Visitor<'de> for ValueColumnVisitor {
-                type Value = ValueColumn;
+//     #[derive(Clone, Copy, Debug, Serialize)]
+//     pub struct NullableRef<'a, T> {
+//         data: &'a [MaybeUninit<T>],
+//         nulls: &'a BitVec,
+//     }
 
-                fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                    formatter.write_str("enum ValueColumn")
-                }
+//     impl Serialize for NullableRef<'_, T> {
+//         fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+//             for
+//             iter.collect::<Vec<_>>().serialize(serializer)
+//         }
+//     }
 
-                fn visit_enum<A>(self, data: A) -> Result<Self::Value, A::Error>
-                where
-                    A: de::EnumAccess<'de>,
-                {
-                    let (ty, variant_access) = data.variant()?;
+//     impl<'a, T> Iterator for NotNullIter<'a, T> {
+//         type Item = &'a T;
 
-                    let a = variant_access.tuple_variant(1, MaybeNullSeqVisitor::<u8>::new())?;
+//         fn next(&mut self) -> Option<Self::Item> {
+//             if self.index < self.data.len() {
+//                 let value = &self.data[self.index];
+//                 self.index += 1;
+//                 Some(value)
+//             } else {
+//                 None
+//             }
+//         }
+//     }
 
-                    match ty {
-                        Type::U8 => {
-                            let values: Vec<Option<u8>> = variant_access
-                                .tuple_variant(1, MaybeNullSeqVisitor::<u8>::new())?;
-                            let has_nulls = values.iter().any(|v| v.is_none());
-                            let nulls = if has_nulls {
-                                Some(values.iter().map(|v| v.is_none()).collect())
-                            } else {
-                                None
-                            };
-                            let vec = values
-                                .into_iter()
-                                .map(|v| match v {
-                                    Some(val) => MaybeUninit::new(val),
-                                    None => MaybeUninit::uninit(),
-                                })
-                                .collect();
-                            Ok(ValueColumn {
-                                values: ValueColumnInner::U8(vec),
-                                nulls,
-                            })
-                        }
-                        Type::I32 => {
-                            let values: Vec<Option<i32>> = variant_access
-                                .tuple_variant(1, MaybeNullSeqVisitor::<i32>::new())?;
-                            let has_nulls = values.iter().any(|v| v.is_none());
-                            let nulls = if has_nulls {
-                                Some(values.iter().map(|v| v.is_none()).collect())
-                            } else {
-                                None
-                            };
-                            let vec = values
-                                .into_iter()
-                                .map(|v| match v {
-                                    Some(val) => MaybeUninit::new(val),
-                                    None => MaybeUninit::uninit(),
-                                })
-                                .collect();
-                            Ok(ValueColumn {
-                                values: ValueColumnInner::I32(vec),
-                                nulls,
-                            })
-                        }
-                        Type::Date => {
-                            let values: Vec<Option<NaiveDate>> = variant_access
-                                .tuple_variant(1, MaybeNullSeqVisitor::<NaiveDate>::new())?;
-                            let has_nulls = values.iter().any(|v| v.is_none());
-                            let nulls = if has_nulls {
-                                Some(values.iter().map(|v| v.is_none()).collect())
-                            } else {
-                                None
-                            };
-                            let vec = values
-                                .into_iter()
-                                .map(|v| match v {
-                                    Some(val) => MaybeUninit::new(val),
-                                    None => MaybeUninit::uninit(),
-                                })
-                                .collect();
-                            Ok(ValueColumn {
-                                values: ValueColumnInner::Date(vec),
-                                nulls,
-                            })
-                        }
-                        Type::DateTime => {
-                            let values: Vec<Option<NaiveDateTime>> = variant_access
-                                .tuple_variant(1, MaybeNullSeqVisitor::<NaiveDateTime>::new())?;
-                            let has_nulls = values.iter().any(|v| v.is_none());
-                            let nulls = if has_nulls {
-                                Some(values.iter().map(|v| v.is_none()).collect())
-                            } else {
-                                None
-                            };
-                            let vec = values
-                                .into_iter()
-                                .map(|v| match v {
-                                    Some(val) => MaybeUninit::new(val),
-                                    None => MaybeUninit::uninit(),
-                                })
-                                .collect();
-                            Ok(ValueColumn {
-                                values: ValueColumnInner::DateTime(vec),
-                                nulls,
-                            })
-                        }
-                        Type::String => {
-                            let values: Vec<Option<String>> = variant_access
-                                .tuple_variant(1, MaybeNullSeqVisitor::<String>::new())?;
-                            let has_nulls = values.iter().any(|v| v.is_none());
-                            let nulls = if has_nulls {
-                                Some(values.iter().map(|v| v.is_none()).collect())
-                            } else {
-                                None
-                            };
-                            let vec = values
-                                .into_iter()
-                                .map(|v| match v {
-                                    Some(val) => MaybeUninit::new(val),
-                                    None => MaybeUninit::uninit(),
-                                })
-                                .collect();
-                            Ok(ValueColumn {
-                                values: ValueColumnInner::String(vec),
-                                nulls,
-                            })
-                        }
-                    }
-                }
-            }
+//     impl<'a, T> Iterator for NullableIter<'a, T> {
+//         type Item = Option<&'a T>;
 
-            enum MaybeNullSeq<T> {
-                NotNull(Vec<T>),
-                Null(Vec<Option<T>>),
-            }
+//         fn next(&mut self) -> Option<Self::Item> {
+//             if self.index < self.data.len() {
+//                 let is_null = self
+//                     .nulls
+//                     .get(self.index)
+//                     .expect("must encode null for every value");
+//                 let value = &self.data[self.index];
+//                 self.index += 1;
 
-            struct MaybeNullSeqVisitor<T>(std::marker::PhantomData<T>);
+//                 Some((!is_null).then_some(unsafe { value.assume_init_ref() }))
+//             } else {
+//                 None
+//             }
+//         }
+//     }
 
-            impl<T> MaybeNullSeqVisitor<T> {
-                fn new() -> Self {
-                    MaybeNullSeqVisitor(std::marker::PhantomData)
-                }
-            }
+//     impl<'a, T> Iterator for Iter<'a, T> {
+//         type Item = Option<&'a T>;
 
-            impl<'de, T> Visitor<'de> for MaybeNullSeqVisitor<T>
-            where
-                T: Deserialize<'de>,
-            {
-                type Value = MaybeNullSeq<T>;
+//         fn next(&mut self) -> Option<Self::Item> {
+//             match self {
+//                 Iter::NotNull(iter) => iter.next().map(Some),
+//                 Iter::Nullable(iter) => iter.next(),
+//             }
+//         }
+//     }
 
-                fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                    formatter.write_str("sequence")
-                }
+//     impl<'a> Iterator for IterTy<'a> {
+//         type Item = Option<ValueRef<'a>>;
 
-                fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-                where
-                    A: SeqAccess<'de>,
-                {
-                    seq.next_element();
-                    while let Some(value) = seq.next_element()? {
-                        values.push(value);
-                    }
-                    Ok(MaybeNullableSeq::NotNullable(values))
-                }
-            }
+//         fn next(&mut self) -> Option<Self::Item> {
+//             match self {
+//                 IterTy::U8(iter) => iter.next().map(|opt| opt.map(ValueRef::U8)),
+//                 IterTy::I32(iter) => iter.next().map(|opt| opt.map(ValueRef::I32)),
+//                 IterTy::String(iter) => iter.next().map(|opt| opt.map(|s| ValueRef::String(&s))),
+//                 IterTy::Date(iter) => iter.next().map(|opt| opt.map(ValueRef::Date)),
+//                 IterTy::DateTime(iter) => iter.next().map(|opt| opt.map(ValueRef::DateTime)),
+//             }
+//         }
+//     }
 
-            const VARIANTS: &[&str] = &["U8", "I32", "Date", "DateTime", "String"];
-            deserializer.deserialize_enum("ValueColumn", VARIANTS, ValueColumnVisitor)
-        }
-    }
+//     mod col_serde {
+//         use serde::{Deserialize, Serialize};
 
-    #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-    pub struct Table {
-        pub columns: Vec<(String, ValueColumn)>,
-    }
-}
+//         use super::*;
 
-use std::pin::pin;
+//         impl Serialize for ValueColumn {
+//             fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+//                 let iter = self.iter();
 
-use futures::StreamExt;
-use leptos::prelude::*;
-use mysql_async::consts::ColumnFlags;
-use mysql_async::Row;
-use serde::{Deserialize, Serialize};
-use types::*;
+//                 serializer.serialize_tuple_variant(name, variant_index, variant, len)
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
-pub enum MyTable {
-    People,
-    Clubs,
-    Roles,
-    Membership,
-    Events,
-    PhysicalEvents,
-    VirtualEvents,
-    Addresses,
-}
+//                 iter.collect::<Vec<_>>().serialize(serializer)
+//             }
+//         }
+//     }
 
-impl MyTable {
-    pub fn name(&self) -> &'static str {
-        use MyTable as T;
-        match self {
-            T::People => "People",
-            T::Clubs => "Clubs",
-            T::Roles => "Roles",
-            T::Membership => "Membership",
-            T::Events => "Events",
-            T::PhysicalEvents => "PhysicalEvents",
-            T::VirtualEvents => "VirtualEvents",
-            T::Addresses => "Addresses",
-        }
-    }
-}
+//     // #[derive(Clone, Debug, Default, Serialize, Deserialize)]
+//     // pub struct Table {
+//     //     pub columns: Vec<(String, ValueColumn)>,
+//     // }
+// }
 
-#[server]
-pub async fn fetch(table: MyTable) -> Result<Table, ServerFnError> {
-    use mysql_async::prelude::*;
-    use mysql_async::Pool;
+// // use std::pin::pin;
 
-    let mut conn = use_context::<Pool>().expect("global").get_conn().await?;
+// // use futures::StreamExt;
+// // use leptos::prelude::*;
+// // use mysql_async::consts::ColumnFlags;
+// // use mysql_async::Row;
+// // use serde::{Deserialize, Serialize};
+// // use types::*;
 
-    let stmt = format!("SELECT * FROM {};", table.name());
-    let stream = conn.exec_stream(stmt, ()).await?.peekable();
-    let stream = pin!(stream);
+// // #[derive(Clone, Copy, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
+// // pub enum MyTable {
+// //     People,
+// //     Clubs,
+// //     Roles,
+// //     Membership,
+// //     Events,
+// //     PhysicalEvents,
+// //     VirtualEvents,
+// //     Addresses,
+// // }
 
-    let Some(cols) = stream.as_mut().peek().await else {
-        return Ok(Table::default());
-    };
+// // impl MyTable {
+// //     pub fn name(&self) -> &'static str {
+// //         use MyTable as T;
+// //         match self {
+// //             T::People => "People",
+// //             T::Clubs => "Clubs",
+// //             T::Roles => "Roles",
+// //             T::Membership => "Membership",
+// //             T::Events => "Events",
+// //             T::PhysicalEvents => "PhysicalEvents",
+// //             T::VirtualEvents => "VirtualEvents",
+// //             T::Addresses => "Addresses",
+// //         }
+// //     }
+// // }
 
-    let row: &Row = cols.as_ref()?;
-    let columns = row
-        .columns()
-        .iter()
-        .map(|c| {
-            let cname = c.name_str().to_string();
-            let ctype = c.column_type();
-            let cflags = c.flags();
+// // #[server]
+// // pub async fn fetch(table: MyTable) -> Result<Table, ServerFnError> {
+// //     use mysql_async::prelude::*;
+// //     use mysql_async::Pool;
 
-            let not_null = cflags.contains(ColumnFlags::NOT_NULL_FLAG);
+// //     let mut conn = use_context::<Pool>().expect("global").get_conn().await?;
 
-            use mysql_async::consts::ColumnType as CT;
-            let value_column = match ctype {
-                CT::MYSQL_TYPE_TINY => ValueColumn::empty_u8(not_null),
-                CT::MYSQL_TYPE_LONG => ValueColumn::empty_i32(not_null),
-                CT::MYSQL_TYPE_VARCHAR | CT::MYSQL_TYPE_STRING | CT::MYSQL_TYPE_VAR_STRING => {
-                    ValueColumn::empty_string(not_null)
-                }
-                CT::MYSQL_TYPE_DATE | CT::MYSQL_TYPE_NEWDATE => ValueColumn::empty_date(not_null),
-                CT::MYSQL_TYPE_DATETIME
-                | CT::MYSQL_TYPE_TIMESTAMP
-                | CT::MYSQL_TYPE_DATETIME2
-                | CT::MYSQL_TYPE_TIMESTAMP2 => ValueColumn::empty_datetime(not_null),
-                _ => unimplemented!("unsupported column type: {ctype:?}"),
-            };
-            (cname, value_column)
-        })
-        .collect();
+// //     let stmt = format!("SELECT * FROM {};", table.name());
+// //     let stream = conn.exec_stream(stmt, ()).await?.peekable();
+// //     let stream = pin!(stream);
 
-    let table = Table { columns };
+// //     let Some(cols) = stream.as_mut().peek().await else {
+// //         return Ok(Table::default());
+// //     };
 
-    // while let Some(row) = stream.next().await {
-    //     let row = row?;
-    //     for (i, (_, col)) in table.columns.iter_mut().enumerate() {
-    //         col.push(row[i]);
-    //     }
-    // }
+// //     let row: &Row = cols.as_ref()?;
+// //     let columns = row
+// //         .columns()
+// //         .iter()
+// //         .map(|c| {
+// //             let cname = c.name_str().to_string();
+// //             let ctype = c.column_type();
+// //             let cflags = c.flags();
 
-    // .exec_fold(stmt, (), Table::default(), |table, row: Row| {
-    //     for col in &*row.columns() {
-    //         let ctype = col.column_type();
-    //         let cname = col.name_str();
-    //     }
+// //             let not_null = cflags.contains(ColumnFlags::NOT_NULL_FLAG);
 
-    //     //
-    //     todo!("parse row into table")
-    // })
-    // .await?;
+// //             use mysql_async::consts::ColumnType as CT;
+// //             let value_column = match ctype {
+// //                 CT::MYSQL_TYPE_TINY => ValueColumn::empty_u8(not_null),
+// //                 CT::MYSQL_TYPE_LONG => ValueColumn::empty_i32(not_null),
+// //                 CT::MYSQL_TYPE_VARCHAR | CT::MYSQL_TYPE_STRING | CT::MYSQL_TYPE_VAR_STRING => {
+// //                     ValueColumn::empty_string(not_null)
+// //                 }
+// //                 CT::MYSQL_TYPE_DATE | CT::MYSQL_TYPE_NEWDATE => ValueColumn::empty_date(not_null),
+// //                 CT::MYSQL_TYPE_DATETIME
+// //                 | CT::MYSQL_TYPE_TIMESTAMP
+// //                 | CT::MYSQL_TYPE_DATETIME2
+// //                 | CT::MYSQL_TYPE_TIMESTAMP2 => ValueColumn::empty_datetime(not_null),
+// //                 _ => unimplemented!("unsupported column type: {ctype:?}"),
+// //             };
+// //             (cname, value_column)
+// //         })
+// //         .collect();
 
-    Ok(table)
-}
+// //     let table = Table { columns };
+
+// //     // while let Some(row) = stream.next().await {
+// //     //     let row = row?;
+// //     //     for (i, (_, col)) in table.columns.iter_mut().enumerate() {
+// //     //         col.push(row[i]);
+// //     //     }
+// //     // }
+
+// //     // .exec_fold(stmt, (), Table::default(), |table, row: Row| {
+// //     //     for col in &*row.columns() {
+// //     //         let ctype = col.column_type();
+// //     //         let cname = col.name_str();
+// //     //     }
+
+// //     //     //
+// //     //     todo!("parse row into table")
+// //     // })
+// //     // .await?;
+
+// //     Ok(table)
+// // }
