@@ -1,0 +1,25 @@
+.table-container {
+  overflow-x: auto;
+}
+
+.db-table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ccc;
+}
+
+.db-table th,
+.db-table td {
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.db-table tbody tr:nth-child(even) {
+  background-color: #f3f3f3;
+}
+
+.trash {
+  width: 1%;
+  white-space: nowrap;
+}
