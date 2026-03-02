@@ -17,7 +17,7 @@ BEGIN
     DROP TABLE IF EXISTS `PhysicalEvents`;
     DROP TABLE IF EXISTS `VirtualEvents`;
     
-    -------- CREATION --------
+    -- CREATION --
     CREATE TABLE `Addresses` (
         `address_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
         `country_code` char(3) NOT NULL,
@@ -108,7 +108,7 @@ BEGIN
         CONSTRAINT `fk_VirtualEvents_Events1` FOREIGN KEY (`event_id`) REFERENCES `Events` (`event_id`) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-    -------- SAMPLE DATA --------
+    -- SAMPLE DATA --
     INSERT INTO Clubs 
     (club_id, name, date_created, is_active) VALUES 
     (1, 'organatans', '2050-12-25', 1),
