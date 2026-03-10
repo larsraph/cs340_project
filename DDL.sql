@@ -31,7 +31,7 @@ CREATE TABLE `Addresses` (
 
 
 CREATE TABLE `People` (
-    `person_id` int(10) unsigned NOT NULL,
+    `person_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `email` varchar(45) NOT NULL,
     `onid` varchar(45) NOT NULL,
     `phone_number` varchar(45) NOT NULL,
