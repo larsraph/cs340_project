@@ -1,0 +1,169 @@
+DELIMITER $$
+
+CREATE PROCEDURE reset()
+BEGIN
+    -- Body is a copy of DDL.sql --
+
+    SET FOREIGN_KEY_CHECKS = 0;
+
+    DROP TABLE IF EXISTS `Addresses`;
+
+    DROP TABLE IF EXISTS `People`;
+    DROP TABLE IF EXISTS `Roles`;
+    DROP TABLE IF EXISTS `Clubs`;
+    DROP TABLE IF EXISTS `Membership`;
+
+    DROP TABLE IF EXISTS `Events`;
+    DROP TABLE IF EXISTS `PhysicalEvents`;
+    DROP TABLE IF EXISTS `VirtualEvents`;
+    
+    -- CREATION --
+    CREATE TABLE `Addresses` (
+        `address_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `country_code` char(3) NOT NULL,
+        `zip_code` varchar(45) NOT NULL,
+        `address_ln1` varchar(45) NOT NULL,
+        `address_ln2` varchar(45) DEFAULT NULL,
+        `city` varchar(45) DEFAULT NULL,
+        `state` varchar(45) DEFAULT NULL,
+        PRIMARY KEY (`address_id`),
+        UNIQUE KEY `address_id_UNIQUE` (`address_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+    CREATE TABLE `People` (
+        `person_id` int(10) unsigned NOT NULL,
+        `email` varchar(45) NOT NULL,
+        `onid` varchar(45) NOT NULL,
+        `phone_number` varchar(45) NOT NULL,
+        `date_of_birth` date NOT NULL,
+        `gender_identity` varchar(45) NOT NULL,
+        `address_id` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`person_id`,`address_id`),
+        UNIQUE KEY `person_id_UNIQUE` (`person_id`),
+        UNIQUE KEY `email_UNIQUE` (`email`),
+        UNIQUE KEY `onid_UNIQUE` (`onid`),
+        UNIQUE KEY `phone_number_UNIQUE` (`phone_number`),
+        KEY `fk_People_Addresses1_idx` (`address_id`),
+        CONSTRAINT `fk_People_Addresses1` FOREIGN KEY (`address_id`) REFERENCES `Addresses` (`address_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    CREATE TABLE `Roles` (
+    `role_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `name` varchar(45) NOT NULL,
+    PRIMARY KEY (`role_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    CREATE TABLE `Clubs` (
+        `club_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `name` varchar(45) NOT NULL,
+        `date_created` date NOT NULL,
+        `is_active` tinyint(4) NOT NULL,
+        PRIMARY KEY (`club_id`),
+        UNIQUE KEY `club_id_UNIQUE` (`club_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    CREATE TABLE `Membership` (
+        `person_id` int(10) unsigned NOT NULL,
+        `role_id` int(10) unsigned NOT NULL,
+        `club_id` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`person_id`,`role_id`,`club_id`),
+        KEY `fk_Membership_Roles1_idx` (`role_id`),
+        KEY `fk_Membership_Clubs1_idx` (`club_id`),
+        CONSTRAINT `fk_Membership_Clubs1` FOREIGN KEY (`club_id`) REFERENCES `Clubs` (`club_id`) ON DELETE CASCADE,
+        CONSTRAINT `fk_Membership_People1` FOREIGN KEY (`person_id`) REFERENCES `People` (`person_id`) ON DELETE CASCADE,
+        CONSTRAINT `fk_Membership_Roles1` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+    CREATE TABLE `Events` (
+        `event_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `name` varchar(45) NOT NULL,
+        `description` longtext NOT NULL,
+        `time_start` datetime NOT NULL,
+        `time_end` datetime NOT NULL,
+        `club_id` int(10) unsigned NOT NULL,
+        `organizer_id` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`event_id`,`club_id`,`organizer_id`),
+        UNIQUE KEY `event_id_UNIQUE` (`event_id`),
+        KEY `fk_Events_Clubs_idx` (`club_id`),
+        KEY `fk_Events_People1_idx` (`organizer_id`),
+        CONSTRAINT `fk_Events_Clubs` FOREIGN KEY (`club_id`) REFERENCES `Clubs` (`club_id`) ON DELETE CASCADE,
+        CONSTRAINT `fk_Events_People1` FOREIGN KEY (`organizer_id`) REFERENCES `People` (`person_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    CREATE TABLE `PhysicalEvents` (
+        `event_id` int(10) unsigned NOT NULL,
+        `address_id` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`event_id`,`address_id`),
+        KEY `fk_PhysicalEvents_Addresses1_idx` (`address_id`),
+        CONSTRAINT `fk_PhysicalEvents_Addresses1` FOREIGN KEY (`address_id`) REFERENCES `Addresses` (`address_id`),
+        CONSTRAINT `fk_PhysicalEvents_Events1` FOREIGN KEY (`event_id`) REFERENCES `Events` (`event_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    CREATE TABLE `VirtualEvents` (
+        `event_id` int(10) unsigned NOT NULL,
+        `url` varchar(255) NOT NULL,
+        PRIMARY KEY (`event_id`),
+        CONSTRAINT `fk_VirtualEvents_Events1` FOREIGN KEY (`event_id`) REFERENCES `Events` (`event_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+    -- SAMPLE DATA --
+    INSERT INTO Clubs 
+    (club_id, name, date_created, is_active) VALUES 
+    (1, 'organatans', '2050-12-25', 1),
+    (2, 'slugs',      '2016-03-04', 0),
+    (3, 'beavers',    '2026-02-05', 1);
+
+    INSERT INTO Addresses 
+    (address_id, country_code, zip_code, address_ln1, address_ln2, city, state) VALUES
+    (1, 'USA', '20500', '1600 Pennsylvania Ave', NULL, 'Washington', 'DC'),
+    (2, 'USA', '12345', '200 Abc Pl', NULL, NULL, NULL),
+    (3, 'USA', '56789', '666 Devil Street', NULL, NULL, NULL);
+
+    INSERT INTO People 
+    (person_id, address_id, email, onid, phone_number, date_of_birth, gender_identity) VALUES
+    (1, 1, 'joebiden@ab.c',   'bijo@osu.edu', '1231231234', '1999-03-21', 'Male'),
+    (2, 1, 'obama@ab.c',      'obba@osu.edu', '2342342345', '2001-04-12', 'Male'),
+    (3, 2, 'president@ab.c',  'prez@osu.edu', '3453453456', '2000-09-24', 'Yo Mama'),
+    (4, 3, 'sweetfruit@ab.c', 'frsw@osu.edu', '4564564567', '1989-11-23', 'Female');
+
+    INSERT INTO Roles 
+    (role_id, name) VALUES
+    (1, 'Vainglorious Leader'),
+    (2, 'Grunt'),
+    (3, 'Infiltrator');
+
+    INSERT INTO `Membership`
+    (`club_id`, `person_id`, `role_id`) VALUES
+    (1, 1, 1),
+    (2, 1, 3),
+    (2, 2, 1),
+    (1, 4, 2),
+    (3, 4, 2);
+
+    INSERT INTO `Events`
+    (`event_id`, `club_id`, `organizer_id`, `name`, `description`, `time_start`, `time_end`) VALUES
+    (1, 2, 2, 'Valorant', 'Too lazy', '2026-02-05 08:00:00', '2026-02-05 12:00:00'),
+    (2, 3, 2, 'CSGO LAN', 'Also lazy', '2026-02-05 13:30:00', '2026-02-05 17:45:00'),
+    (3, 1, 2, 'Rivals', 'Weeeee', '2026-02-06 09:15:00', '2026-02-06 11:30:00'),
+    (4, 2, 1, 'Book club', 'Reading Red Rising', '2026-02-06 14:00:00', '2026-02-06 18:30:00'),
+    (5, 3, 1, 'Factorio', '*Cracktorio', '2026-02-07 07:45:00', '2026-02-07 11:15:00'),
+    (6, 1, 1, 'Running club', 'Nyuuuuuu', '2026-02-07 12:00:00', '2026-02-07 16:00:00');
+
+    INSERT INTO `VirtualEvents`
+    (`event_id`, `url`) VALUES
+    (1, 'discord.gg/valorantppl'),
+    (3, 'discord.gg/rivalsppl'),
+    (5, 'zoom.com/pretend-this-is-uuid');
+
+    INSERT INTO `PhysicalEvents`
+    (`event_id`, `address_id`) VALUES
+    (6, 2),
+    (2, 3),
+    (4, 3);
+
+    SET FOREIGN_KEY_CHECKS = 1;
+END $$
+
+DELIMITER ;

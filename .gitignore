@@ -1,1 +1,30 @@
 node_modules
+
+frontend/dist
+frontend/.wrangler
+frontend/.output
+frontend/.vercel
+frontend/.netlify
+frontend/.vinxi
+frontend/app.config.timestamp_*.js
+
+# Environment
+frontend/.env
+frontend/.env*.local
+
+# dependencies
+frontend/node_modules/
+
+# IDEs and editors
+frontend//.idea
+frontend/.project
+frontend/.classpath
+frontend/*.launch
+frontend/.settings/
+
+
+# System Files
+frontend/.DS_Store
+frontend/Thumbs.db
+
+backup.sql

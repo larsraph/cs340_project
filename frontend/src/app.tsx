@@ -10,6 +10,7 @@ export default function App() {
       root={props => (
         <MetaProvider>
           <Title>OSU Clubs DB</Title>
+          <a href="/">Home</a>
           <a href="/people">People</a>
           <a href="/roles">Roles</a>
           <a href="/membership">Membership</a>
