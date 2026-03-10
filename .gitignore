@@ -26,3 +26,5 @@ frontend/.settings/
 # System Files
 frontend/.DS_Store
 frontend/Thumbs.db
+
+backup.sql
