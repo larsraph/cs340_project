@@ -58,6 +58,3 @@ The database supports several relationships:
 - Membership connects **people, clubs, and roles**
 
 This structure allows the system to track participation across organizations while maintaining data consistency.
-
-
-## Project Structure
