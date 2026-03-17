@@ -7,17 +7,8 @@
  */
 
 import { json } from '@solidjs/router';
-import mysql from 'mysql2/promise';
 import { broadcastDbUpdate } from '~/utils/realtime';
-
-const pool: any = mysql.createPool({
-    waitForConnections: true,
-    connectionLimit   : 10,
-    host              : 'classmysql.engr.oregonstate.edu',
-    user              : 'cs340_larsraph',
-    password          : '5310',
-    database          : 'cs340_larsraph'
-});
+import { pool } from '~/utils/dbPool';
 
 const ALLOWED_TABLES = new Set([
   'Addresses',
@@ -57,7 +48,7 @@ export async function GET({ params }: { params: { table: string } }) {
       return json({ error: tableError }, { status: 400 });
     }
 
-    const [rows] = await pool.query('CALL sp_select_table(?)', [tableName]);
+    const [rows] = await pool.execute('CALL sp_select_table(?)', [tableName]);
 
     return json(normalizeProcedureRows(rows));
   } catch (error) {
@@ -81,7 +72,7 @@ export async function POST({ params, request }: { params: { table: string }; req
       return json({ error: 'Invalid request body' }, { status: 400 });
     }
 
-    await pool.query('CALL sp_insert_row(?, ?)', [tableName, JSON.stringify(data)]);
+    await pool.execute('CALL sp_insert_row(?, ?)', [tableName, JSON.stringify(data)]);
 
     broadcastDbUpdate({ table: tableName, action: 'insert' });
 
@@ -107,7 +98,7 @@ export async function PUT({ params, request }: { params: { table: string }; requ
       return json({ error: 'Invalid request body' }, { status: 400 });
     }
 
-    await pool.query('CALL sp_update_row(?, ?, ?)', [tableName, JSON.stringify(data), JSON.stringify(where)]);
+    await pool.execute('CALL sp_update_row(?, ?, ?)', [tableName, JSON.stringify(data), JSON.stringify(where)]);
 
     broadcastDbUpdate({ table: tableName, action: 'update' });
 
@@ -133,7 +124,7 @@ export async function DELETE({ params, request }: { params: { table: string }; r
       return json({ error: 'Invalid request body' }, { status: 400 });
     }
 
-    await pool.query('CALL sp_delete_row(?, ?)', [tableName, JSON.stringify(where)]);
+    await pool.execute('CALL sp_delete_row(?, ?)', [tableName, JSON.stringify(where)]);
 
     broadcastDbUpdate({ table: tableName, action: 'delete' });
 

@@ -7,17 +7,8 @@
  */
 
 import { json } from '@solidjs/router';
-import mysql from 'mysql2/promise';
 import { broadcastDbUpdate } from '~/utils/realtime';
-
-const pool = mysql.createPool({
-    waitForConnections: true,
-    connectionLimit   : 10,
-    host              : 'classmysql.engr.oregonstate.edu',
-    user              : 'cs340_larsraph',
-    password          : '5310',
-    database          : 'cs340_larsraph'
-});
+import { pool } from '~/utils/dbPool';
 
 export async function POST() {
   try {
