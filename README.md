@@ -58,3 +58,50 @@ The database supports several relationships:
 - Membership connects **people, clubs, and roles**
 
 This structure allows the system to track participation across organizations while maintaining data consistency.
+
+---
+
+## Setup Instructions
+
+### Prerequisites
+- Node.js (v18 or higher recommended)
+- npm
+- MySQL
+
+### Installation
+
+git clone <repository-url>
+cd cs340_project/frontend
+npm install
+npm run dev
+
+## Citations 
+This project was developed with reference to course materials and external tools. Portions of the code and design were adapted from the following sources:
+
+** Module 4: Exploration - SQL JOINS**
+Source code and structure adapted from the provided materials 
+[Canvas Link] https://canvas.oregonstate.edu/courses/2031764/pages/exploration-sql-joins?module_item_id=26243394
+
+** Module 5: Exploration - MYSQL Cascade**
+Source code and structure adapted from the provided materials 
+[Canvas Link] https://canvas.oregonstate.edu/courses/2031764/pages/exploration-mysql-cascade?module_item_id=26243410 
+
+** Module 6: Database Application Design**
+Source code and structure adapted from the provided materials 
+[Canvas] https://canvas.oregonstate.edu/courses/2031764/pages/exploration-database-application-design?module_item_id=26243417 
+
+** Module 8: Implementing CUD operations in your app**
+Source code and structure adapted from the provided materials 
+[Canvas] https://canvas.oregonstate.edu/courses/2031764/pages/exploration-implementing-cud-operations-in-your-app?module_item_id=26243436 
+
+** AI-Assisted Development Tools**
+GitHub Copilot (VS Code Extension)
+Used to assist with code suggestions, syntax completion, and debugging. All generated code was reviewed and modified by the authors.
+
+### Design Inspiration
+
+**OSU Ideal-Logic Club Management System**  
+This project was conceptually inspired by Oregon State University's student organization management platform, including its approach to organizing clubs and events.
+
+  - https://see.oregonstate.edu/ela/clubs-organizations  
+  - https://see.oregonstate.edu/ela/find-clubs  
